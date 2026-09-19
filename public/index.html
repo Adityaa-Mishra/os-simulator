@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OS Simulator Platform | Professional Operating Systems Lab</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/modules/cpu.css">
+  <link rel="stylesheet" href="/css/modules/process.css">
+  <link rel="stylesheet" href="/css/modules/memory.css">
+  <link rel="stylesheet" href="/css/modules/disk.css">
+  <link rel="stylesheet" href="/css/modules/deadlock.css">
+  <link rel="stylesheet" href="/css/modules/filesystem.css">
+  <link rel="stylesheet" href="/css/modules/auth.css">
+  <link rel="stylesheet" href="/css/modules/persistence.css">
+  <link rel="stylesheet" href="/css/modules/learning.css">
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar" aria-label="Primary Navigation">
+      <div class="sidebar-header">
+        <div class="logo-icon" aria-hidden="true">OS</div>
+        <div class="logo-text">OS Lab Platform</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Workspace</div>
+        <a href="#/" class="nav-item active" id="nav-dashboard">
+          <span class="nav-icon" aria-hidden="true">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#/learn" class="nav-item" id="nav-learn">
+          <span class="nav-icon" aria-hidden="true">📚</span>
+          <span>Learning Hub</span>
+        </a>
+
+        <div class="nav-section-title">Simulators</div>
+        <a href="#/cpu" class="nav-item" id="nav-cpu">
+          <span class="nav-icon" aria-hidden="true">⚡</span>
+          <span>CPU Scheduling</span>
+        </a>
+        <a href="#/process" class="nav-item" id="nav-process">
+          <span class="nav-icon" aria-hidden="true">🔄</span>
+          <span>Process Management</span>
+        </a>
+        <a href="#/memory" class="nav-item" id="nav-memory">
+          <span class="nav-icon" aria-hidden="true">💾</span>
+          <span>Memory Management</span>
+        </a>
+        <a href="#/disk" class="nav-item" id="nav-disk">
+          <span class="nav-icon" aria-hidden="true">💿</span>
+          <span>Disk Scheduling</span>
+        </a>
+        <a href="#/deadlock" class="nav-item" id="nav-deadlock">
+          <span class="nav-icon" aria-hidden="true">🔒</span>
+          <span>Deadlock Management</span>
+        </a>
+        <a href="#/filesystem" class="nav-item" id="nav-filesystem">
+          <span class="nav-icon" aria-hidden="true">📁</span>
+          <span>File System</span>
+        </a>
+
+        <div class="nav-section-title">Personal</div>
+        <a href="#/saved" class="nav-item" id="nav-saved">
+          <span class="nav-icon" aria-hidden="true">💾</span>
+          <span>Saved Simulations</span>
+        </a>
+        <a href="#/history" class="nav-item" id="nav-history">
+          <span class="nav-icon" aria-hidden="true">📜</span>
+          <span>Simulation History</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span>v1.0.0 (Lab Edition)</span>
+        <span class="badge badge-success">Online</span>
+      </div>
+    </aside>
+
+    <!-- Sidebar Backdrop for Mobile Drawer -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+            ☰
+          </button>
+          <div class="breadcrumb" aria-label="Breadcrumb">
+            <span>OS Lab</span>
+            <span aria-hidden="true">/</span>
+            <span id="breadcrumb-current" class="breadcrumb-current">Dashboard</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Theme Toggle -->
+          <button id="theme-toggle-btn" class="btn btn-secondary btn-sm" title="Toggle Theme" aria-label="Toggle Theme">
+            <span id="theme-icon" aria-hidden="true">☀️</span>
+          </button>
+
+          <!-- User Session Action -->
+          <div id="auth-nav-container">
+            <button id="login-btn" class="btn btn-primary btn-sm">Sign In / Register</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic View Container -->
+      <main id="view-container" class="view-container" role="main">
+        <!-- Rendered dynamically by SPA router -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Global Modal Mount Point -->
+  <div id="modal-container" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true"></div>
+
+  <!-- Global Toast Mount Point -->
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+  <!-- Application Bootstrap -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

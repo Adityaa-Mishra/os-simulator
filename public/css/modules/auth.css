@@ -1,0 +1,125 @@
+/* ==========================================================================
+   OS Simulator - Authentication & Account Styles (auth.css)
+   ========================================================================== */
+
+.auth-container {
+  max-width: 800px;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+.auth-card-narrow {
+  max-width: 440px;
+  margin: var(--space-8) auto;
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+}
+
+.account-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), #6366f1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+}
+
+.account-summary h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.account-summary p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: var(--text-sm);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.auth-nav-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.auth-nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.auth-nav-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-nav-name:hover {
+  color: var(--accent-primary);
+}

@@ -1,0 +1,203 @@
+/* ==========================================================================
+   OS Simulator - Persistence & History Styles (persistence.css)
+   ========================================================================== */
+
+.persistence-container {
+  max-width: 1200px;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.filter-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+}
+
+/* Saved Simulations Grid */
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-4);
+}
+
+.saved-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 4px solid var(--accent-primary);
+}
+
+.saved-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-2);
+}
+
+.saved-card-title {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.saved-card-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+  min-height: 40px;
+}
+
+.saved-card-meta {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.saved-card-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-3);
+}
+
+/* History Table */
+.history-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.history-table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.history-table tr:hover {
+  background: var(--bg-tertiary);
+}
+
+.metric-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  margin-right: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+/* Learning Progress Section */
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.progress-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 4px solid var(--border-color);
+  transition: border-color var(--transition-fast);
+}
+
+.progress-card.completed {
+  border-left-color: var(--accent-success);
+}
+
+.progress-card.in-progress {
+  border-left-color: var(--accent-primary);
+}
+
+.progress-stats {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-3) 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-10) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-3);
+  opacity: 0.8;
+}
+
+.empty-state-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  max-width: 450px;
+  margin: 0 auto var(--space-4);
+}

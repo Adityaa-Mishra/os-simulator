@@ -1,0 +1,409 @@
+/**
+ * File System Module Stylesheet
+ * VFS tree hierarchy, 32-block disk map, operation controls, terminal log, and metadata cards.
+ */
+
+.filesystem-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* VFS Tree Card */
+.vfs-tree-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.vfs-tree-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--space-2);
+}
+
+.vfs-tree-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.vfs-node-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.vfs-tree-body {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.vfs-tree-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.vfs-tree-row:hover {
+  background: var(--bg-surface-hover);
+}
+
+.vfs-tree-row.selected {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid var(--accent-primary);
+}
+
+.vfs-icon {
+  font-size: 14px;
+}
+
+.vfs-name {
+  font-weight: 600;
+}
+
+.vfs-dirname {
+  color: #3b82f6;
+}
+
+.vfs-filename {
+  color: var(--text-primary);
+}
+
+.vfs-badges {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.vfs-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.vfs-badge.vfs-open {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.vfs-badge.vfs-closed {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.vfs-badge.vfs-size {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+.vfs-badge.vfs-blocks {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+}
+
+.vfs-badge.vfs-perm {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+/* Disk Block Card */
+.disk-block-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.disk-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.block-card-title {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.block-card-subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-left: var(--space-2);
+}
+
+.disk-metrics-pills {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.disk-pill {
+  font-size: var(--text-xs);
+  background: var(--bg-surface);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+}
+
+.pill-lbl {
+  color: var(--text-muted);
+}
+
+.disk-pill.pill-frag {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.disk-block-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  .disk-block-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.disk-block-tile {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 52px;
+  transition: all var(--transition-fast);
+}
+
+.disk-block-tile.block-free {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.disk-block-tile.block-allocated {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.disk-block-tile.highlight-block {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.block-num {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.block-status {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.block-free .block-status {
+  color: #10b981;
+}
+
+.block-allocated .block-status {
+  color: #60a5fa;
+}
+
+.block-owner {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.disk-block-legend {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  font-size: var(--text-xs);
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-box.free {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10b981;
+}
+
+.legend-box.allocated {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+}
+
+.frag-alert {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  color: #fca5a5;
+  font-size: var(--text-xs);
+}
+
+/* Node Details Card */
+.vfs-details-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.vfs-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--space-2);
+}
+
+.details-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.vfs-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.detail-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.detail-lbl {
+  color: var(--text-muted);
+  min-width: 110px;
+}
+
+.detail-val {
+  color: var(--text-primary);
+}
+
+/* Operation Log */
+.vfs-log-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.vfs-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vfs-log-body {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.vfs-log-entry {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.log-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.log-badge.success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.log-badge.failure {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.log-op {
+  font-weight: 700;
+  color: var(--accent-primary);
+  min-width: 50px;
+}
+
+.log-msg {
+  color: var(--text-secondary);
+}
