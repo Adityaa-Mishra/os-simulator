@@ -16,6 +16,9 @@
   <link rel="stylesheet" href="/css/modules/auth.css">
   <link rel="stylesheet" href="/css/modules/persistence.css">
   <link rel="stylesheet" href="/css/modules/learning.css">
+  <link rel="stylesheet" href="/css/modules/desktop.css">
+  <link rel="stylesheet" href="/css/modules/terminal.css">
+  <link rel="stylesheet" href="/css/modules/apps.css">
   <!-- Chart.js for visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -33,6 +36,10 @@
         <a href="#/" class="nav-item active" id="nav-dashboard">
           <span class="nav-icon" aria-hidden="true">📊</span>
           <span>Dashboard</span>
+        </a>
+        <a href="#/os" class="nav-item" id="nav-os">
+          <span class="nav-icon" aria-hidden="true">🖥️</span>
+          <span>AdityyaOS Desktop</span>
         </a>
         <a href="#/learn" class="nav-item" id="nav-learn">
           <span class="nav-icon" aria-hidden="true">📚</span>
@@ -101,6 +108,12 @@
         </div>
 
         <div class="topbar-right">
+          <!-- Enter AdityyaOS Primary Entry Action -->
+          <a href="#/os" id="enter-os-btn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+            <span aria-hidden="true">🚀</span>
+            <span>Enter AdityyaOS</span>
+          </a>
+
           <!-- Theme Toggle -->
           <button id="theme-toggle-btn" class="btn btn-secondary btn-sm" title="Toggle Theme" aria-label="Toggle Theme">
             <span id="theme-icon" aria-hidden="true">☀️</span>

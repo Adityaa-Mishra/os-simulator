@@ -47,9 +47,10 @@ export const dashboardView = {
                   A deterministic, client-side simulation suite covering CPU scheduling, process lifecycles, virtual memory, disk head movement, deadlock avoidance, and file system allocation.
                 </p>
               </div>
-              <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
-                <a href="#/learn" class="btn btn-primary">📚 Explore Learning Hub</a>
-                <a href="#/cpu" class="btn btn-secondary">⚡ Open CPU Simulator</a>
+              <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+                <a href="#/os" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.25rem; font-size: 0.95rem;">🚀 Enter AdityyaOS</a>
+                <a href="#/learn" class="btn btn-secondary">📚 Learning Hub</a>
+                <a href="#/cpu" class="btn btn-outline">⚡ Simulators</a>
               </div>
             </div>
           </div>

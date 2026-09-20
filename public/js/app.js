@@ -17,6 +17,7 @@ import { savedView } from './views/savedView.js';
 import { historyView } from './views/historyView.js';
 import { learnHubView } from './views/learnHubView.js';
 import { moduleLearnView } from './views/moduleLearnView.js';
+import { desktopView } from './views/desktopView.js';
 import './engines/cpu/index.js'; // Auto-registers all CPU scheduling algorithms
 import './engines/process/index.js'; // Auto-registers Process Management engine
 import './engines/memory/index.js'; // Auto-registers Memory Allocation engines
@@ -112,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Register SPA routes
   router.register('#/', dashboardView, { title: 'Dashboard' });
+  router.register('#/os', desktopView, { title: 'AdityyaOS Desktop' });
   router.register('#/cpu', cpuView, { title: 'CPU Scheduling' });
   router.register('#/process', processView, { title: 'Process Management' });
   router.register('#/memory', memoryView, { title: 'Memory Management' });

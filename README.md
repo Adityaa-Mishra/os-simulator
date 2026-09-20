@@ -37,7 +37,59 @@ A comprehensive, interactive Operating Systems simulation and laboratory platfor
   - Server-side IDOR protection ensuring user-isolated resources.
   - DOM XSS prevention through HTML sanitization (`escapeHtml`).
   - Explicit server payload bounds (`1mb` limit on JSON and URL-encoded bodies).
-  - 100% automated test coverage with **363/363 passing tests across 26 test files**.
+  - 100% automated test coverage with **411/411 passing tests across 30 test files**.
+
+---
+
+## AdityyaOS Core Architecture (Phase 12)
+
+AdityyaOS is evolving into a full **browser-based simulated operating system** where users can enter the OS and run simulated desktop workflows.
+
+> [!NOTE]
+> **AdityyaOS is a simulated operating system running entirely inside a browser environment (Vanilla JavaScript ES6+)**, not a bare-metal or machine-virtualized operating system.
+
+### Architecture Layering
+
+```
+AdityyaOS UI (Future: Desktop, Taskbar, Window Manager)
+                     ↓
+Application Runtime (Future: Terminal, Apps, Settings)
+                     ↓
+        AdityyaOS API / System Calls (kernel.syscall)
+                     ↓
+             Kernel Coordinator (Kernel.js)
+        [OS State | Event Emitter | Lifecycle]
+                     ↓
+        ┌────────────┬────────────┬────────────┬────────────┬────────────┬────────────┐
+        ▼            ▼            ▼            ▼            ▼            ▼
+  ProcessMgr    SchedulerMgr   MemoryMgr     FsMgr       DiskMgr    ResourceMgr
+        │            │            │            │            │            │
+        ▼            ▼            ▼            ▼            ▼            ▼
+   PCB Engine   CPU Engines  Allocation/   VFS Engine   Disk Engines  Banker's
+                             Page Replace                             Engines
+```
+
+1. **Kernel Coordinator (`Kernel.js`)**:
+   - Master headless controller orchestrating state, events, and lifecycle (`boot()`, `shutdown()`, `reset()`).
+   - Supports instantiable creation (`new Kernel()`) for dependency injection and testing, plus a default `kernel` singleton.
+   - Enforces explicit PID semantics: boot begins with PID 1, increments sequentially, and reset returns the counter to 0 (next process is PID 1).
+
+2. **Deterministic OS State (`OSState.js`)**:
+   - Central, serializable state model covering system status, CPU, memory, processes, filesystem, disks, resources, and applications.
+   - Read-only safe deep snapshots via `getState()`.
+
+3. **Subsystem Adapter Managers**:
+   - **ProcessManager**: Process lifecycle (`NEW`, `READY`, `RUNNING`, `WAITING`, `TERMINATED`), PCB tracking, and CPU process coordination (terminated processes cannot remain running).
+   - **SchedulerManager**: Pure adapter over existing CPU scheduling engines (`FCFS`, `SJF`, `SRTF`, `RR`, `PRIORITY`).
+   - **MemoryManager**: Adapts contiguous memory allocation engines (`FIRST_FIT`, `BEST_FIT`, `WORST_FIT`) with transactional allocate/free semantics.
+   - **FileSystemManager**: Adapts the in-memory Virtual File System (VFS) with file/directory CRUD, permissions, and open/close states.
+   - **DiskManager**: Adapts the 6 disk scheduling engines (`FCFS`, `SSTF`, `SCAN`, `C-SCAN`, `LOOK`, `C-LOOK`) with request queuing.
+   - **ResourceManager**: Deadlock avoidance via Banker's algorithm; unsafe requests are transactionally rejected and rolled back.
+
+4. **System Call Layer (`SystemCalls.js`)**:
+   - Structured API: `kernel.syscall('callName', { ...payload })`.
+   - Guaranteed result format: `{ success: boolean, data?: any, error?: string }`.
+   - Error-isolation: failed operations return clear errors, do not corrupt state, and do not emit success events.
 
 ---
 
@@ -50,7 +102,7 @@ A comprehensive, interactive Operating Systems simulation and laboratory platfor
 | **Database** | MongoDB, Mongoose ODM |
 | **Authentication** | JSON Web Tokens (JWT) in HTTP-only cookies, bcryptjs |
 | **Visualization** | Chart.js & Custom Canvas/DOM Renderers |
-| **Testing** | Vitest (363 automated unit, integration, and security tests) |
+| **Testing** | Vitest (411 automated unit, integration, and security tests) |
 
 ---
 
