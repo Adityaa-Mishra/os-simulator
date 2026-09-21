@@ -64,6 +64,9 @@ export class DesktopEnvironment {
    */
   async mount(container) {
     this.container = container;
+    if (typeof window !== 'undefined') {
+      window.desktop = this;
+    }
     const currentStatus = this.kernel.getStatus();
 
     if (currentStatus !== SystemStatus.RUNNING) {

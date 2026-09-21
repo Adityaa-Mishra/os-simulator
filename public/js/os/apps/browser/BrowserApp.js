@@ -93,7 +93,7 @@ export class BrowserApp {
     if (this.api.window && typeof this.api.window.create === 'function') {
       this.api.window.create({
         appId: 'browser',
-        title: 'Google Chrome (Incognito)',
+        title: 'Additya Browser (Incognito)',
         options: { isIncognito: true }
       });
     } else {
@@ -107,7 +107,7 @@ export class BrowserApp {
     if (this.api.window && typeof this.api.window.create === 'function') {
       this.api.window.create({
         appId: 'browser',
-        title: 'Google Chrome',
+        title: 'Additya Browser',
         options: { isIncognito: false }
       });
     } else {
@@ -121,7 +121,7 @@ export class BrowserApp {
       const active = this.state.getActiveTab();
       const title = active?.title || url;
       const suffix = this.isIncognito ? '(Incognito)' : '';
-      this.api.window.setTitle(`${title} - Google Chrome ${suffix}`.trim());
+      this.api.window.setTitle(`${title} - Additya Browser ${suffix}`.trim());
     }
   }
 
@@ -142,9 +142,9 @@ export class BrowserApp {
  */
 export const browserApp = Object.freeze({
   id: 'browser',
-  name: 'Web Browser',
-  version: '2.0.0',
-  description: 'Full-featured Chrome-grade web browser with profiles, incognito, and passwords vault',
+  name: 'Additya Browser',
+  version: '2.4.0',
+  description: 'Fast, private, and controlled web browser with native search, profiles, and incognito mode',
   icon: '🌐',
   category: 'Internet',
   permissions: Object.freeze([
@@ -156,10 +156,10 @@ export const browserApp = Object.freeze({
     PackagePermissions.NETWORK_CONNECT
   ]),
   window: Object.freeze({
-    title: 'Google Chrome',
+    title: 'Additya Browser',
     icon: '🌐',
-    width: 860,
-    height: 580,
+    width: 880,
+    height: 600,
     singleton: false
   }),
   entry: (api, container, options) => {

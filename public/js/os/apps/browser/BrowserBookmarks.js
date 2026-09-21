@@ -59,7 +59,6 @@ export class BrowserBookmarks {
 
     // Initialize empty if none exist
     this.bookmarks = [];
-    this.save();
   }
 
   save() {

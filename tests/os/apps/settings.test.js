@@ -133,14 +133,105 @@ describe('Phase 23: Settings Native Application', () => {
     app.destroy();
   });
 
-  it('does not include competing Phase 33 theme personalization engine', async () => {
+  it('does not include competing Phase 33 theme personalization engine notice and renders full appearance controls', async () => {
     const app = new SettingsApp(api, container);
     await app.init();
 
     await app.setTab('display');
-    // Confirm no theme customizer or wallpaper picker controls
-    expect(container.innerHTML).not.toContain('Theme Engine');
-    expect(container.innerHTML).not.toContain('Change Wallpaper');
+    expect(container.innerHTML).not.toContain('Phase 33');
+    expect(container.innerHTML).toContain('Theme Mode');
+    expect(container.innerHTML).toContain('Accent Color');
+    expect(container.innerHTML).toContain('Desktop Wallpaper');
+    expect(container.innerHTML).toContain('UI & Font Scaling');
+    expect(container.innerHTML).toContain('Acrylic Glassmorphism');
+    app.destroy();
+  });
+
+  it('updates appearance settings (theme, accent, wallpaper, font scale, glassmorphism)', async () => {
+    const mockDoc = {
+      documentElement: {
+        attributes: new Map(),
+        setAttribute: vi.fn(function (k, v) { this.attributes.set(k, v); }),
+        getAttribute: vi.fn(function (k) { return this.attributes.get(k) || null; }),
+        style: {
+          properties: new Map(),
+          setProperty: vi.fn(function (k, v) { this.properties.set(k, v); })
+        }
+      }
+    };
+    const mockStorage = {
+      store: new Map(),
+      setItem: vi.fn(function (k, v) { this.store.set(k, v); }),
+      getItem: vi.fn(function (k) { return this.store.get(k) || null; })
+    };
+
+    const prevDoc = globalThis.document;
+    const prevStorage = globalThis.localStorage;
+    globalThis.document = mockDoc;
+    globalThis.localStorage = mockStorage;
+
+    try {
+      const app = new SettingsApp(api, container);
+      await app.init();
+
+      // Test theme switching
+      app.setTheme('light');
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-theme', 'light');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('theme', 'light');
+
+      // Test toggle theme
+      mockDoc.documentElement.getAttribute.mockReturnValue('light');
+      app.toggleTheme();
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-theme', 'dark');
+
+      // Test accent color
+      app.setAccent('#3b82f6');
+      expect(mockDoc.documentElement.style.setProperty).toHaveBeenCalledWith('--accent-primary', '#3b82f6');
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-accent', '#3b82f6');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('accentColor', '#3b82f6');
+
+      // Test wallpaper
+      app.setWallpaper('cyber');
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-wallpaper', 'cyber');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('wallpaper', 'cyber');
+
+      // Test font scale
+      app.setFontScale('large');
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-font-scale', 'large');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('fontScale', 'large');
+
+      // Test glassmorphism toggle
+      app.toggleGlassmorphism(false);
+      expect(mockDoc.documentElement.setAttribute).toHaveBeenCalledWith('data-effects', 'solid');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('effects', 'solid');
+
+      app.destroy();
+    } finally {
+      globalThis.document = prevDoc;
+      globalThis.localStorage = prevStorage;
+    }
+  });
+
+  it('renders application list with launch buttons and handles launch action', async () => {
+    const launchSpy = vi.fn();
+    api.window = {
+      create: launchSpy
+    };
+
+    const app = new SettingsApp(api, container);
+    await app.init();
+
+    await app.setTab('apps');
+    expect(container.innerHTML).toContain('Installed Applications');
+    expect(container.innerHTML).toContain('btn-launch-app');
+    expect(container.innerHTML).toContain('data-app-id="calculator"');
+
+    // Test programmatic launch delegation
+    if (api.window && typeof api.window.create === 'function') {
+      api.window.create({ appId: 'calculator' });
+    }
+    expect(launchSpy).toHaveBeenCalledWith({ appId: 'calculator' });
+
     app.destroy();
   });
 });

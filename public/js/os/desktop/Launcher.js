@@ -34,7 +34,7 @@ export const SYSTEM_APPLICATIONS = Object.freeze([
   },
   {
     id: 'browser',
-    name: 'Browser',
+    name: 'Additya Browser',
     icon: '🌐',
     category: 'Utilities',
     description: 'Web browser & simulator gateway',

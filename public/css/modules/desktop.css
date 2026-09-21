@@ -1079,3 +1079,43 @@ body.os-desktop-active .view-container {
   flex-shrink: 0;
   margin-top: 1px;
 }
+
+/* Dynamic Wallpapers */
+[data-wallpaper="nebula"] .os-wallpaper {
+  background: 
+    radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.3), transparent 50%),
+    radial-gradient(circle at 25% 75%, rgba(59, 130, 246, 0.25), transparent 50%),
+    linear-gradient(135deg, #0f0c1b 0%, #1a103c 50%, #0d0a1a 100%) !important;
+}
+
+[data-wallpaper="cyber"] .os-wallpaper {
+  background: 
+    radial-gradient(ellipse at 50% 0%, rgba(0, 242, 254, 0.2), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(79, 70, 229, 0.2), transparent 60%),
+    linear-gradient(180deg, #050811 0%, #0c1222 50%, #080d1a 100%) !important;
+}
+
+[data-wallpaper="sunset"] .os-wallpaper {
+  background: 
+    radial-gradient(ellipse at 30% 80%, rgba(245, 158, 11, 0.25), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(244, 63, 94, 0.2), transparent 50%),
+    linear-gradient(135deg, #18091e 0%, #2c1236 50%, #110715 100%) !important;
+}
+
+[data-wallpaper="slate"] .os-wallpaper {
+  background: 
+    linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+}
+
+/* Glassmorphism Effect */
+[data-effects="glass"] .os-window {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(15, 23, 42, 0.82) !important;
+}
+
+[data-effects="glass"] .os-taskbar {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(15, 23, 42, 0.85) !important;
+}

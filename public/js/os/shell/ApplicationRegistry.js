@@ -117,6 +117,7 @@ export class ApplicationRegistry {
           PackagePermissions.FILESYSTEM_READ,
           PackagePermissions.MEMORY_READ,
           PackagePermissions.PROFILE_READ,
+          PackagePermissions.PROFILE_WRITE,
           PackagePermissions.NETWORK_READ,
           PackagePermissions.WINDOW_CONTROL,
           PackagePermissions.APPLICATION_LIFECYCLE

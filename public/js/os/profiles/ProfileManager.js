@@ -95,6 +95,14 @@ export class ProfileManager {
   }
 
   /**
+   * Get currently active profile snapshot.
+   * @returns {Object|null}
+   */
+  getCurrentProfile() {
+    return this.activeProfile ? this.activeProfile.toJSON() : null;
+  }
+
+  /**
    * Controlled profile creation.
    * Creates /home/<username> in AdityyaFS and stores profile.
    * @param {Object} params

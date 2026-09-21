@@ -298,6 +298,8 @@ export class FileManager {
     if (['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'].includes(ext)) {
       if (this.api?.app?._runtime) {
         this.api.app._runtime.launch('image-viewer', { filePath: fullPath });
+      } else if (this.api?.window?.create) {
+        this.api.window.create({ appId: 'image-viewer', filePath: fullPath });
       } else if (typeof this.options?.onOpenFile === 'function') {
         this.options.onOpenFile(fullPath, 'image-viewer');
       }
@@ -305,6 +307,8 @@ export class FileManager {
       // Open in Text Editor
       if (this.api?.app?._runtime) {
         this.api.app._runtime.launch('text-editor', { filePath: fullPath });
+      } else if (this.api?.window?.create) {
+        this.api.window.create({ appId: 'text-editor', filePath: fullPath });
       } else if (typeof this.options?.onOpenFile === 'function') {
         this.options.onOpenFile(fullPath, 'text-editor');
       }

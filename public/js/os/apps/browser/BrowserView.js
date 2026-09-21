@@ -1,8 +1,8 @@
 /**
  * public/js/os/apps/browser/BrowserView.js
- * DOM rendering, user interaction, and Chrome-like layout controller for AdityyaOS Browser.
- * Features rounded tab strip, Incognito theme, Omnibox autocomplete, downloads shelf,
- * extensions popup, profile switcher, 3-dots menu, and sandboxed viewport.
+ * DOM rendering, user interaction, and layout controller for Additya Browser.
+ * Features rounded tab strip, Incognito theme, Omnibox autocomplete, Privacy Shield hub,
+ * native Additya Search, downloads shelf, extensions popup, profile switcher, and 3-dots menu.
  */
 
 import { BrowserNavigation } from './BrowserNavigation.js';
@@ -51,8 +51,8 @@ export class BrowserView {
     this.container = null;
     this.errorMessage = null;
     this.showBookmarksBar = true;
-    this.activeDropdown = null; // 'profile' | 'menu' | 'extensions' | null
-    this.activeModal = null; // 'clearData' | 'addBookmark' | 'addPassword' | 'addProfile' | null
+    this.activeDropdown = null; // 'profile' | 'menu' | 'extensions' | 'shield' | null
+    this.activeModal = null;
     this.cleanupListeners = [];
   }
 
@@ -73,8 +73,8 @@ export class BrowserView {
     };
 
     this.container.innerHTML = `
-      <div class="os-browser-app ${isIncognito ? 'incognito' : ''}" role="region" aria-label="Web Browser">
-        <!-- Chrome Tab Strip -->
+      <div class="os-browser-app ${isIncognito ? 'incognito' : ''}" role="region" aria-label="Additya Browser">
+        <!-- Additya Tab Strip -->
         <div class="os-browser-tab-strip browser-tabbar">
           <div class="os-browser-tabs" id="browser-tabs-container" role="tablist">
             ${this.getTabsHtml()}
@@ -83,40 +83,43 @@ export class BrowserView {
           ${isIncognito ? '<div class="chrome-incognito-pill"><span class="pill-icon">🕶️</span><span>Incognito</span></div>' : ''}
         </div>
 
-        <!-- Chrome Navigation Toolbar -->
+        <!-- Additya Navigation Toolbar -->
         <div class="os-browser-toolbar browser-toolbar">
           <div class="os-browser-nav-controls">
             <button class="os-browser-btn" id="btn-browser-back" title="Click to go back" aria-label="Back">←</button>
             <button class="os-browser-btn" id="btn-browser-forward" title="Click to go forward" aria-label="Forward">→</button>
             <button class="os-browser-btn" id="btn-browser-reload" title="Reload this page" aria-label="Reload">↻</button>
-            <button class="os-browser-btn" id="btn-browser-home" title="Open the home page" aria-label="Home">🏠</button>
+            <button class="os-browser-btn" id="btn-browser-home" title="Open Additya Home" aria-label="Home">🏠</button>
           </div>
 
           <!-- Omnibox -->
           <div class="os-browser-omnibox-wrapper">
             <form class="os-browser-address-form" id="browser-address-form">
-              <span class="os-browser-ssl-icon" id="browser-ssl-icon" title="View site information">🔒</span>
+              <span class="os-browser-ssl-icon" id="browser-ssl-icon" title="Site Security: Verified">🔒</span>
               <input 
                 type="text" 
                 class="os-browser-omnibox" 
                 id="browser-omnibox" 
-                placeholder="Search Google or type a URL" 
+                placeholder="Search with Additya or enter address..." 
                 autocomplete="off" 
               />
-              <button type="button" class="os-browser-popout-btn" id="btn-browser-popout" title="Open in new window / external tab" aria-label="Open externally">↗</button>
+              <button type="button" class="os-browser-popout-btn" id="btn-browser-popout" title="Open in external window (bypasses iframe restrictions)" aria-label="Open externally">↗</button>
               <button type="button" class="os-browser-btn-star" id="btn-browser-bookmark" title="Bookmark this tab" aria-label="Bookmark">★</button>
             </form>
             <!-- Omnibox Suggestions Dropdown -->
             <div class="os-browser-omnibox-dropdown" id="browser-omnibox-dropdown" style="display: none;"></div>
           </div>
 
-          <!-- Action Buttons: Extensions, Profile, 3-dots Menu -->
+          <!-- Control Hub: Privacy Shield, Extensions, Profile, 3-dots Menu -->
           <div class="os-browser-actions">
-            <button class="os-browser-btn os-btn-action" id="btn-browser-extensions" title="Extensions" aria-label="Extensions">🧩</button>
-            <button class="os-browser-btn os-btn-action os-btn-profile" id="btn-browser-profile" title="Current Profile: ${escapeHtml(activeProfile.name)}" aria-label="Profile">
+            <button class="os-browser-btn os-btn-action os-btn-shield" id="btn-browser-shield" title="Additya Privacy Shield: Active" aria-label="Privacy Shield">
+              <span class="shield-icon">🛡️</span>
+            </button>
+            <button class="os-browser-btn os-btn-action" id="btn-browser-extensions" title="Extensions Hub" aria-label="Extensions">🧩</button>
+            <button class="os-browser-btn os-btn-action os-btn-profile" id="btn-browser-profile" title="Additya Profile: ${escapeHtml(activeProfile.name)}" aria-label="Profile">
               <span class="profile-avatar-circle" style="background-color: ${activeProfile.avatarColor || '#4285f4'};">${escapeHtml(activeProfile.avatar || '👤')}</span>
             </button>
-            <button class="os-browser-btn os-btn-action" id="btn-browser-menu" title="Customize and control Google Chrome" aria-label="Menu">⋮</button>
+            <button class="os-browser-btn os-btn-action" id="btn-browser-menu" title="Customize and control Additya Browser" aria-label="Menu">⋮</button>
           </div>
         </div>
 
@@ -133,7 +136,7 @@ export class BrowserView {
         <!-- Bottom Downloads Shelf -->
         <div class="os-browser-downloads-shelf" id="browser-downloads-shelf" style="display: none;">
           <div class="shelf-header">
-            <span class="shelf-title">Downloads</span>
+            <span class="shelf-title">Additya Downloads</span>
             <button class="shelf-close-btn" id="btn-close-shelf" title="Close">✕</button>
           </div>
           <div class="shelf-items" id="shelf-items-container"></div>
@@ -141,6 +144,7 @@ export class BrowserView {
 
         <!-- Dropdown Menus Container -->
         <div class="os-browser-dropdowns" id="browser-dropdowns">
+          ${this.getShieldDropdownHtml()}
           ${this.getProfileDropdownHtml()}
           ${this.getExtensionsDropdownHtml()}
           ${this.getKebabMenuHtml()}
@@ -163,6 +167,7 @@ export class BrowserView {
       const isActive = activeTab?.id === tab.id;
       const isInternal = BrowserNavigation.isInternalUrl(tab.url);
       let icon = isInternal ? '⚛️' : '🌐';
+      if (tab.url.includes('search')) icon = '🔍';
       if (tab.url.includes('incognito')) icon = '🕶️';
       if (tab.url.includes('settings')) icon = '⚙️';
       if (tab.url.includes('passwords')) icon = '🔑';
@@ -237,11 +242,41 @@ export class BrowserView {
             <h3>Website Security Notice</h3>
             <p>This website (<code>${escapeHtml(url)}</code>) restricts direct iframe embedding via <code>X-Frame-Options: SAMEORIGIN</code> or <code>Content-Security-Policy</code>.</p>
             <div class="os-fallback-actions">
-              <button class="chrome-btn primary" id="btn-fallback-popout">Open in External Window ↗</button>
-              <button class="chrome-btn-outline" id="btn-fallback-home">Return to New Tab</button>
+              <button class="chrome-btn primary" id="btn-fallback-popout">Open in External Tab ↗</button>
+              <button class="chrome-btn-outline" id="btn-fallback-search">Search with Additya 🔍</button>
+              <button class="chrome-btn-outline" id="btn-fallback-home">Return to Home</button>
             </div>
           </div>
         </div>
+      </div>
+    `;
+  }
+
+  getShieldDropdownHtml() {
+    return `
+      <div class="chrome-dropdown-card shield-dropdown" id="dropdown-shield" style="display: none;">
+        <div class="shield-dropdown-header">
+          <span class="shield-badge-big">🛡️</span>
+          <h4>Additya Privacy Shield</h4>
+          <span class="shield-status-tag active">Active & Protecting</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="shield-stats">
+          <div class="shield-stat-row">
+            <span>Trackers & Ads Blocked</span>
+            <strong class="text-cyan">4</strong>
+          </div>
+          <div class="shield-stat-row">
+            <span>Fingerprinting Protection</span>
+            <strong class="text-green">Enabled</strong>
+          </div>
+          <div class="shield-stat-row">
+            <span>HTTPS Upgrade</span>
+            <strong class="text-cyan">Automatic</strong>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item-btn os-internal-link" data-url="adityya://settings">Privacy Shield Settings</button>
       </div>
     `;
   }
@@ -256,7 +291,7 @@ export class BrowserView {
         <div class="profile-dropdown-header">
           <div class="dropdown-avatar" style="background-color: ${activeProfile.avatarColor || '#4285f4'};">${escapeHtml(activeProfile.avatar || '👤')}</div>
           <h4>${escapeHtml(activeProfile.name)}</h4>
-          <p>${escapeHtml(activeProfile.email || (isIncognito ? 'Incognito Mode' : 'Not signed in'))}</p>
+          <p>${escapeHtml(activeProfile.email || (isIncognito ? 'Incognito Mode' : 'Additya Profile'))}</p>
           <div class="dropdown-sync-status">
             <span>${activeProfile.syncEnabled ? '✔ Sync is on' : 'Sync is off'}</span>
           </div>
@@ -294,10 +329,10 @@ export class BrowserView {
     return `
       <div class="chrome-dropdown-card extensions-dropdown" id="dropdown-extensions" style="display: none;">
         <div class="dropdown-header-title">
-          <h4>Extensions</h4>
+          <h4>Additya Extensions Hub</h4>
           <button class="manage-exts-link os-internal-link" data-url="adityya://extensions">Manage extensions</button>
         </div>
-        <p class="exts-subtext">No access needed</p>
+        <p class="exts-subtext">Active extensions protecting your browsing</p>
         <div class="extensions-dropdown-list">
           ${exts.map(ext => `
             <div class="ext-dropdown-row">
@@ -330,6 +365,10 @@ export class BrowserView {
           <span class="shortcut">Ctrl+Shift+N</span>
         </button>
         <div class="dropdown-divider"></div>
+        <button class="kebab-item" id="kebab-save-page">
+          <span>Save page as...</span>
+          <span class="shortcut">Ctrl+S</span>
+        </button>
         <button class="kebab-item os-internal-link" data-url="adityya://history">
           <span>History</span>
           <span class="shortcut">Ctrl+H</span>
@@ -343,10 +382,10 @@ export class BrowserView {
           <span class="shortcut">Ctrl+Shift+O</span>
         </button>
         <button class="kebab-item os-internal-link" data-url="adityya://passwords">
-          <span>Google Password Manager</span>
+          <span>Additya Password Vault</span>
         </button>
         <button class="kebab-item os-internal-link" data-url="adityya://extensions">
-          <span>Extensions</span>
+          <span>Extensions Hub</span>
         </button>
         <div class="dropdown-divider"></div>
         <button class="kebab-item" id="kebab-clear-data">
@@ -357,7 +396,7 @@ export class BrowserView {
           <span>Settings</span>
         </button>
         <button class="kebab-item os-internal-link" data-url="adityya://version">
-          <span>About Google Chrome</span>
+          <span>About Additya Browser</span>
         </button>
       </div>
     `;
@@ -372,6 +411,7 @@ export class BrowserView {
     const btnHome = this.container.querySelector('#btn-browser-home');
     const btnBookmark = this.container.querySelector('#btn-browser-bookmark');
     const btnPopout = this.container.querySelector('#btn-browser-popout');
+    const btnShield = this.container.querySelector('#btn-browser-shield');
     const btnExtensions = this.container.querySelector('#btn-browser-extensions');
     const btnProfile = this.container.querySelector('#btn-browser-profile');
     const btnMenu = this.container.querySelector('#btn-browser-menu');
@@ -504,6 +544,11 @@ export class BrowserView {
     omnibox?.addEventListener('input', onOmniboxInput);
 
     // Dropdown Toggles
+    btnShield?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleDropdown('shield');
+    });
+
     btnProfile?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggleDropdown('profile');
@@ -527,10 +572,140 @@ export class BrowserView {
       }
     };
 
-    if (typeof document !== 'undefined') {
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
       document.addEventListener('click', onDocumentClick);
-      this.cleanupListeners.push(() => document.removeEventListener('click', onDocumentClick));
+      this.cleanupListeners.push(() => {
+        if (typeof document.removeEventListener === 'function') {
+          document.removeEventListener('click', onDocumentClick);
+        }
+      });
     }
+
+    // Container-level click delegation for internal links, download buttons, and shelf close
+    const onContainerClick = (e) => {
+      // 1. Internal link delegation
+      const link = e.target.closest('.os-internal-link');
+      if (link) {
+        e.preventDefault();
+        const targetUrl = link.getAttribute('data-url');
+        if (targetUrl) {
+          this.closeAllDropdowns();
+          this.loadUrlInActiveTab(targetUrl);
+        }
+        return;
+      }
+
+      // 2. Open download in Files app ("Show in folder")
+      const openBtn = e.target.closest('.btn-open-download');
+      if (openBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window !== 'undefined') {
+          const event = new CustomEvent('os-open-app', {
+            bubbles: true,
+            detail: { appId: 'files', path: '/home/user/Downloads' }
+          });
+          this.container?.dispatchEvent(event);
+        }
+        return;
+      }
+
+      // 3. Close downloads shelf
+      const closeShelf = e.target.closest('#btn-close-shelf');
+      if (closeShelf) {
+        e.preventDefault();
+        const shelf = this.container?.querySelector('#browser-downloads-shelf');
+        if (shelf) shelf.style.display = 'none';
+        return;
+      }
+    };
+    this.container?.addEventListener('click', onContainerClick);
+    this.cleanupListeners.push(() => this.container?.removeEventListener('click', onContainerClick));
+
+    // Keyboard Shortcuts
+    const onKeyDown = (e) => {
+      const isInput = e.target?.tagName === 'INPUT' || e.target?.tagName === 'TEXTAREA';
+
+      // Ctrl+H: Open History
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'h' || e.key === 'H')) {
+        e.preventDefault();
+        this.closeAllDropdowns();
+        this.loadUrlInActiveTab('adityya://history');
+        return;
+      }
+
+      // Ctrl+J: Open Downloads
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'j' || e.key === 'J')) {
+        e.preventDefault();
+        this.closeAllDropdowns();
+        this.loadUrlInActiveTab('adityya://downloads');
+        return;
+      }
+
+      // Ctrl+Shift+O: Open Bookmarks
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'o' || e.key === 'O')) {
+        e.preventDefault();
+        this.closeAllDropdowns();
+        this.loadUrlInActiveTab('adityya://bookmarks');
+        return;
+      }
+
+      // Ctrl+T: New Tab
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 't' || e.key === 'T')) {
+        e.preventDefault();
+        onNewTab();
+        return;
+      }
+
+      // Ctrl+W: Close Active Tab
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'w' || e.key === 'W')) {
+        e.preventDefault();
+        const active = this.state.getActiveTab();
+        if (active) {
+          this.tabs.closeTab(active.id);
+          this.updateAll();
+        }
+        return;
+      }
+
+      // Ctrl+N: New Window
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'n' || e.key === 'N')) {
+        e.preventDefault();
+        if (typeof this.openNewWindow === 'function') this.openNewWindow();
+        return;
+      }
+
+      // Ctrl+Shift+N: New Incognito Window
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'n' || e.key === 'N')) {
+        e.preventDefault();
+        if (typeof this.openIncognitoWindow === 'function') this.openIncognitoWindow();
+        return;
+      }
+
+      // Ctrl+R / F5: Reload
+      if (((e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R')) || e.key === 'F5') {
+        e.preventDefault();
+        onReload();
+        return;
+      }
+
+      // Ctrl+S: Save page as download
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S') && !isInput) {
+        e.preventDefault();
+        this.triggerPageDownload();
+        return;
+      }
+
+      // Ctrl+L or Alt+D: Focus Omnibox
+      if (((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'L')) || (e.altKey && (e.key === 'd' || e.key === 'D'))) {
+        e.preventDefault();
+        omnibox?.focus();
+        omnibox?.select?.();
+        return;
+      }
+    };
+    this.container?.addEventListener('keydown', onKeyDown);
+    this.cleanupListeners.push(() => this.container?.removeEventListener('keydown', onKeyDown));
 
     // Bind Dropdown Items
     this.bindDropdownActions();
@@ -554,17 +729,24 @@ export class BrowserView {
     const q = query.toLowerCase();
     const suggestions = [];
 
-    // Internal pages matching query
+    // 1. Native Additya Search suggestion (instant, never blocked)
+    suggestions.push({
+      title: `Additya Search: "${query}"`,
+      url: `adityya://search?q=${encodeURIComponent(query)}`,
+      icon: '🔍'
+    });
+
+    // 2. Internal pages matching query
     const internalPages = [
       { title: 'New Tab', url: 'adityya://newtab', icon: '⚛️' },
       { title: 'Incognito Mode', url: 'adityya://incognito', icon: '🕶️' },
       { title: 'Settings', url: 'adityya://settings', icon: '⚙️' },
       { title: 'History', url: 'adityya://history', icon: '🕒' },
       { title: 'Bookmarks Manager', url: 'adityya://bookmarks', icon: '★' },
-      { title: 'Google Password Manager', url: 'adityya://passwords', icon: '🔑' },
+      { title: 'Additya Password Vault', url: 'adityya://passwords', icon: '🔑' },
       { title: 'Downloads', url: 'adityya://downloads', icon: '📥' },
-      { title: 'Extensions', url: 'adityya://extensions', icon: '🧩' },
-      { title: 'About Google Chrome', url: 'adityya://version', icon: '🌐' }
+      { title: 'Extensions Hub', url: 'adityya://extensions', icon: '🧩' },
+      { title: 'About Additya Browser', url: 'adityya://version', icon: '⚛️' }
     ];
 
     for (const p of internalPages) {
@@ -573,31 +755,25 @@ export class BrowserView {
       }
     }
 
-    // Bookmarks matching query
+    // 3. Bookmarks matching query
     const bms = this.bookmarks?.searchBookmarks(q) || [];
-    for (const b of bms.slice(0, 3)) {
+    for (const b of bms.slice(0, 2)) {
       suggestions.push({ title: b.title, url: b.url, icon: '★' });
     }
 
-    // History matching query
+    // 4. History matching query
     const hist = this.history?.search(q) || [];
-    for (const h of hist.slice(0, 3)) {
+    for (const h of hist.slice(0, 2)) {
       if (!suggestions.some(s => s.url === h.url)) {
         suggestions.push({ title: h.title || h.url, url: h.url, icon: '🕒' });
       }
     }
 
-    // Google search suggestion
-    suggestions.unshift({
-      title: `Google Search: "${query}"`,
-      url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
-      icon: '🔍'
-    });
-
     return suggestions.slice(0, 6);
   }
 
   toggleDropdown(name) {
+    const shieldDropdown = this.container?.querySelector('#dropdown-shield');
     const profileDropdown = this.container?.querySelector('#dropdown-profile');
     const extsDropdown = this.container?.querySelector('#dropdown-extensions');
     const kebabDropdown = this.container?.querySelector('#dropdown-kebab');
@@ -610,6 +786,7 @@ export class BrowserView {
     this.closeAllDropdowns();
     this.activeDropdown = name;
 
+    if (name === 'shield' && shieldDropdown) shieldDropdown.style.display = 'block';
     if (name === 'profile' && profileDropdown) profileDropdown.style.display = 'block';
     if (name === 'extensions' && extsDropdown) extsDropdown.style.display = 'block';
     if (name === 'kebab' && kebabDropdown) kebabDropdown.style.display = 'block';
@@ -670,6 +847,11 @@ export class BrowserView {
       if (typeof this.openNewWindow === 'function') this.openNewWindow();
     });
 
+    kebabDropdown?.querySelector('#kebab-save-page')?.addEventListener('click', async () => {
+      this.closeAllDropdowns();
+      await this.triggerPageDownload();
+    });
+
     kebabDropdown?.querySelector('#kebab-clear-data')?.addEventListener('click', () => {
       this.closeAllDropdowns();
       this.showClearDataModal();
@@ -712,6 +894,55 @@ export class BrowserView {
       }
     });
 
+    // Native Search Page Form & Buttons
+    const searchForm = viewport.querySelector('#search-page-form');
+    const searchInput = viewport.querySelector('#search-page-input');
+    searchForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = searchInput?.value?.trim();
+      if (val) {
+        this.loadUrlInActiveTab(`adityya://search?q=${encodeURIComponent(val)}`);
+      }
+    });
+
+    // External search engines launcher buttons
+    viewport.querySelector('#btn-search-google')?.addEventListener('click', (e) => {
+      const q = e.currentTarget.getAttribute('data-query');
+      if (typeof window !== 'undefined' && typeof window.open === 'function') {
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+      }
+    });
+
+    viewport.querySelector('#btn-search-ddg')?.addEventListener('click', (e) => {
+      const q = e.currentTarget.getAttribute('data-query');
+      if (typeof window !== 'undefined' && typeof window.open === 'function') {
+        window.open(`https://duckduckgo.com/?q=${encodeURIComponent(q)}`, '_blank');
+      }
+    });
+
+    viewport.querySelector('#btn-search-bing')?.addEventListener('click', (e) => {
+      const q = e.currentTarget.getAttribute('data-query');
+      if (typeof window !== 'undefined' && typeof window.open === 'function') {
+        window.open(`https://www.bing.com/search?q=${encodeURIComponent(q)}`, '_blank');
+      }
+    });
+
+    viewport.querySelector('#btn-search-wiki')?.addEventListener('click', (e) => {
+      const q = e.currentTarget.getAttribute('data-query');
+      if (typeof window !== 'undefined' && typeof window.open === 'function') {
+        window.open(`https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(q)}`, '_blank');
+      }
+    });
+
+    viewport.querySelectorAll('.btn-popout-result').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const u = btn.getAttribute('data-url');
+        if (u && typeof window !== 'undefined' && typeof window.open === 'function') {
+          window.open(u, '_blank');
+        }
+      });
+    });
+
     // NTP Search Form
     const ntpForm = viewport.querySelector('#ntp-search-form');
     const ntpInput = viewport.querySelector('#ntp-search-input');
@@ -732,6 +963,12 @@ export class BrowserView {
       }
     });
 
+    viewport.querySelector('#btn-fallback-search')?.addEventListener('click', () => {
+      const active = this.state.getActiveTab();
+      const query = active?.url || '';
+      this.loadUrlInActiveTab(`adityya://search?q=${encodeURIComponent(query)}`);
+    });
+
     viewport.querySelector('#btn-fallback-home')?.addEventListener('click', () => {
       this.loadUrlInActiveTab(this.state.homeUrl);
     });
@@ -741,6 +978,33 @@ export class BrowserView {
     });
 
     // Settings Actions
+    viewport.querySelectorAll('.settings-nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const section = btn.getAttribute('data-section');
+        viewport.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetSec = viewport.querySelector(`#section-${section}`);
+        if (targetSec && typeof targetSec.scrollIntoView === 'function') {
+          targetSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    viewport.querySelector('#select-search-engine')?.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (this.profileManager?.updatePreferences) {
+        this.profileManager.updatePreferences({ searchEngine: val });
+      }
+    });
+
+    viewport.querySelector('#toggle-bookmarks-bar')?.addEventListener('change', (e) => {
+      this.showBookmarksBar = e.target.checked;
+      const bar = this.container?.querySelector('#browser-bookmarks-bar');
+      if (bar) {
+        bar.style.display = this.showBookmarksBar ? 'flex' : 'none';
+      }
+    });
+
     viewport.querySelector('#btn-toggle-sync')?.addEventListener('click', () => {
       this.profileManager?.toggleSync();
       this.updateAll();
@@ -750,7 +1014,41 @@ export class BrowserView {
       this.showClearDataModal();
     });
 
-    // History Actions: Delete single entry
+    // History Actions: Live Search & Delete
+    const historySearchInput = viewport.querySelector('#history-search-input');
+    const historyContainer = viewport.querySelector('#history-list-container');
+    if (historySearchInput && historyContainer) {
+      historySearchInput.addEventListener('input', () => {
+        const q = historySearchInput.value.trim().toLowerCase();
+        const entries = this.history?.search(q) || [];
+        if (entries.length === 0) {
+          historyContainer.innerHTML = `<div class="empty-state"><p>${q ? `No history entries found matching "${escapeHtml(q)}"` : 'Your browsing history is empty'}</p></div>`;
+        } else {
+          historyContainer.innerHTML = entries.map(e => `
+            <div class="chrome-history-item" data-id="${escapeHtml(e.id || '')}">
+              <span class="item-time">${new Date(e.timestamp || e.visitedAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span class="item-favicon">${e.url.startsWith('adityya://') || e.url.startsWith('chrome://') ? '⚛️' : '🌐'}</span>
+              <div class="item-details">
+                <a href="#" class="os-internal-link item-title" data-url="${escapeHtml(e.url)}">${escapeHtml(e.title || e.url)}</a>
+                <span class="item-url">${escapeHtml(e.url)}</span>
+              </div>
+              <button class="chrome-item-delete" data-delete-id="${escapeHtml(e.id || '')}" title="Remove from history">✕</button>
+            </div>
+          `).join('');
+          historyContainer.querySelectorAll('.chrome-item-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = btn.getAttribute('data-delete-id');
+              if (id && this.history) {
+                this.history.removeEntry(id);
+                btn.closest('.chrome-history-item')?.remove();
+              }
+            });
+          });
+        }
+      });
+    }
+
     viewport.querySelectorAll('.chrome-item-delete').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -766,7 +1064,44 @@ export class BrowserView {
       this.showClearDataModal();
     });
 
-    // Bookmarks Actions: Delete bookmark
+    // Bookmarks Actions: Live Search, Add & Delete
+    const bookmarksSearchInput = viewport.querySelector('#bookmarks-search-input');
+    const bookmarksContainer = viewport.querySelector('#bookmarks-list-container');
+    if (bookmarksSearchInput && bookmarksContainer) {
+      bookmarksSearchInput.addEventListener('input', () => {
+        const q = bookmarksSearchInput.value.trim().toLowerCase();
+        const bms = this.bookmarks?.searchBookmarks(q) || [];
+        if (bms.length === 0) {
+          bookmarksContainer.innerHTML = `<div class="empty-state"><p>${q ? `No bookmarks found matching "${escapeHtml(q)}"` : 'No bookmarks saved yet'}</p></div>`;
+        } else {
+          bookmarksContainer.innerHTML = bms.map(b => `
+            <div class="chrome-bookmark-item" data-url="${escapeHtml(b.url)}">
+              <span class="item-favicon">${b.url.startsWith('adityya://') || b.url.startsWith('chrome://') ? '⚛️' : '🌐'}</span>
+              <div class="item-details">
+                <a href="#" class="os-internal-link item-title" data-url="${escapeHtml(b.url)}">${escapeHtml(b.title)}</a>
+                <span class="item-url">${escapeHtml(b.url)}</span>
+              </div>
+              <div class="item-actions">
+                <button class="chrome-btn-icon delete-bookmark-btn" data-url="${escapeHtml(b.url)}" title="Delete">🗑️</button>
+              </div>
+            </div>
+          `).join('');
+          bookmarksContainer.querySelectorAll('.delete-bookmark-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const url = btn.getAttribute('data-url');
+              if (url && this.bookmarks) {
+                this.bookmarks.removeBookmark(url);
+                btn.closest('.chrome-bookmark-item')?.remove();
+                this.updateBookmarksBar();
+                this.updateBookmarkButton();
+              }
+            });
+          });
+        }
+      });
+    }
+
     viewport.querySelectorAll('.delete-bookmark-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -782,7 +1117,61 @@ export class BrowserView {
       this.showAddBookmarkModal();
     });
 
-    // Passwords Actions: Show/Hide & Delete
+    // Passwords Actions: Live Search, Show/Hide & Delete
+    const pwdSearchInput = viewport.querySelector('#passwords-search-input');
+    const pwdContainer = viewport.querySelector('#passwords-list-container');
+    if (pwdSearchInput && pwdContainer) {
+      pwdSearchInput.addEventListener('input', () => {
+        const q = pwdSearchInput.value.trim().toLowerCase();
+        const allPwds = this.passwords?.getPasswords() || [];
+        const filtered = q ? allPwds.filter(p => (p.site && p.site.toLowerCase().includes(q)) || (p.username && p.username.toLowerCase().includes(q))) : allPwds;
+        if (filtered.length === 0) {
+          pwdContainer.innerHTML = `<div class="empty-state"><p>${q ? `No passwords matching "${escapeHtml(q)}"` : 'No passwords saved in Additya Password Vault'}</p></div>`;
+        } else {
+          pwdContainer.innerHTML = `
+            <table class="chrome-passwords-table">
+              <thead>
+                <tr><th>Website</th><th>Username</th><th>Password</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                ${filtered.map(p => `
+                  <tr data-id="${escapeHtml(p.id)}">
+                    <td class="site-cell"><span class="site-icon">🌐</span><span>${escapeHtml(p.site)}</span></td>
+                    <td>${escapeHtml(p.username)}</td>
+                    <td class="password-cell">
+                      <span class="pwd-masked" id="pwd-val-${escapeHtml(p.id)}">••••••••</span>
+                      <button class="chrome-btn-icon toggle-pwd-btn" data-id="${escapeHtml(p.id)}" data-pwd="${escapeHtml(p.password)}" title="Show/Hide">👁️</button>
+                    </td>
+                    <td><button class="chrome-btn-icon delete-pwd-btn" data-id="${escapeHtml(p.id)}" title="Delete">🗑️</button></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+          pwdContainer.querySelectorAll('.toggle-pwd-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              const pwd = btn.getAttribute('data-pwd');
+              const span = pwdContainer.querySelector(`#pwd-val-${id}`);
+              if (span) {
+                if (span.textContent === '••••••••') { span.textContent = pwd; btn.textContent = '🙈'; }
+                else { span.textContent = '••••••••'; btn.textContent = '👁️'; }
+              }
+            });
+          });
+          pwdContainer.querySelectorAll('.delete-pwd-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              if (id && this.passwords) {
+                this.passwords.removePassword(id);
+                btn.closest('tr')?.remove();
+              }
+            });
+          });
+        }
+      });
+    }
+
     viewport.querySelectorAll('.toggle-pwd-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
@@ -814,7 +1203,55 @@ export class BrowserView {
       this.showAddPasswordModal();
     });
 
-    // Downloads Actions: Clear & Remove
+    // Downloads Actions: Live Search, Mock Download, Clear & Remove
+    const downloadsSearchInput = viewport.querySelector('#downloads-search-input');
+    const downloadsContainer = viewport.querySelector('#downloads-list-container');
+    if (downloadsSearchInput && downloadsContainer) {
+      downloadsSearchInput.addEventListener('input', () => {
+        const q = downloadsSearchInput.value.trim().toLowerCase();
+        const allDownloads = this.downloads?.getDownloads() || [];
+        const filtered = q ? allDownloads.filter(d => (d.filename && d.filename.toLowerCase().includes(q)) || (d.url && d.url.toLowerCase().includes(q))) : allDownloads;
+
+        if (filtered.length === 0) {
+          downloadsContainer.innerHTML = `<div class="empty-state"><p>${q ? `No downloads found matching "${escapeHtml(q)}"` : 'Files you download will appear here in /home/user/Downloads/'}</p></div>`;
+        } else {
+          downloadsContainer.innerHTML = filtered.map(d => `
+            <div class="chrome-download-item" data-id="${escapeHtml(d.id)}">
+              <div class="download-icon">📄</div>
+              <div class="download-details">
+                <h4 class="download-filename">${escapeHtml(d.filename)}</h4>
+                <p class="download-url">${escapeHtml(d.url || '')}</p>
+                <div class="download-meta">
+                  <span>${d.size || 0} bytes</span> • 
+                  <span>${new Date(d.timestamp || Date.now()).toLocaleDateString()}</span> • 
+                  <span class="status-${escapeHtml(d.status || 'completed')}">${escapeHtml(d.status || 'completed')}</span>
+                </div>
+              </div>
+              <div class="download-actions">
+                <button class="chrome-btn-outline btn-open-download" data-path="${escapeHtml(d.path)}">Show in folder</button>
+                <button class="chrome-btn-icon delete-download-btn" data-id="${escapeHtml(d.id)}" title="Remove">✕</button>
+              </div>
+            </div>
+          `).join('');
+          downloadsContainer.querySelectorAll('.delete-download-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              if (id && this.downloads) {
+                this.downloads.removeDownload(id);
+                btn.closest('.chrome-download-item')?.remove();
+              }
+            });
+          });
+        }
+      });
+    }
+
+    viewport.querySelector('#btn-mock-download')?.addEventListener('click', async () => {
+      const filename = `sample_report_${Date.now().toString().slice(-4)}.txt`;
+      const content = `AdityyaOS Sample Download\nGenerated at: ${new Date().toLocaleString()}\nDestination: /home/user/Downloads/${filename}\nStatus: Verified Complete\n`;
+      await this.triggerPageDownload(filename, content);
+    });
+
     viewport.querySelectorAll('.delete-download-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
@@ -831,6 +1268,23 @@ export class BrowserView {
     });
 
     // Extensions Toggles
+    const extsSearchInput = viewport.querySelector('#extensions-search-input');
+    const extsGrid = viewport.querySelector('.chrome-extensions-grid');
+    if (extsSearchInput && extsGrid) {
+      extsSearchInput.addEventListener('input', () => {
+        const q = extsSearchInput.value.trim().toLowerCase();
+        extsGrid.querySelectorAll('.chrome-extension-card').forEach(card => {
+          const title = card.querySelector('h4')?.textContent?.toLowerCase() || '';
+          const desc = card.querySelector('p')?.textContent?.toLowerCase() || '';
+          if (title.includes(q) || desc.includes(q)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+
     viewport.querySelectorAll('.ext-toggle').forEach(toggle => {
       toggle.addEventListener('change', () => {
         const id = toggle.getAttribute('data-id');
@@ -998,13 +1452,13 @@ export class BrowserView {
       <div class="chrome-modal-backdrop" id="modal-add-profile">
         <div class="chrome-modal-card">
           <div class="modal-header">
-            <h3>Add Chrome Profile</h3>
+            <h3>Add Additya Profile</h3>
             <button class="modal-close-btn" id="btn-modal-close">✕</button>
           </div>
           <div class="modal-body">
             <div class="modal-field">
               <label>Profile Name:</label>
-              <input type="text" class="chrome-input" id="prof-input-name" placeholder="e.g. Work, Personal" />
+              <input type="text" class="chrome-input" id="prof-input-name" placeholder="e.g. Work, Personal, Research" />
             </div>
             <div class="modal-field">
               <label>Email (optional):</label>
@@ -1103,6 +1557,50 @@ export class BrowserView {
     }
 
     this.render();
+  }
+
+  async triggerPageDownload(filename = null, content = null) {
+    if (!this.downloads) return null;
+    const active = this.state.getActiveTab();
+    const url = active?.url || 'adityya://newtab';
+    const name = filename || `${(active?.title || 'download').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 24)}_${Date.now().toString().slice(-4)}.html`;
+    const data = content || `<!-- Downloaded from Additya Browser -->\n<!-- URL: ${url} -->\n<!-- Timestamp: ${new Date().toISOString()} -->\n<!DOCTYPE html>\n<html>\n<head><title>${escapeHtml(active?.title || 'Saved Page')}</title></head>\n<body>\n<h1>${escapeHtml(active?.title || 'Saved Page')}</h1>\n<p>Source URL: <a href="${url}">${url}</a></p>\n<div class="content">\nSaved content from AdityyaOS Additya Browser.\n</div>\n</body>\n</html>`;
+
+    const item = await this.downloads.startDownload({
+      filename: name,
+      url,
+      content: data,
+      size: data.length,
+      mimeType: 'text/html'
+    });
+
+    this.showDownloadShelf(item);
+    if (active && (active.url === 'adityya://downloads' || active.url === 'chrome://downloads')) {
+      this.render();
+    }
+    return item;
+  }
+
+  showDownloadShelf(item) {
+    if (!item) return;
+    const shelf = this.container?.querySelector('#browser-downloads-shelf');
+    const itemsContainer = this.container?.querySelector('#shelf-items-container');
+    if (!shelf || !itemsContainer) return;
+
+    shelf.style.display = 'flex';
+    if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
+      const div = document.createElement('div');
+      div.className = 'shelf-item';
+      div.innerHTML = `
+        <span class="shelf-item-icon">📄</span>
+        <div class="shelf-item-meta">
+          <span class="shelf-item-name" title="${escapeHtml(item.filename)}">${escapeHtml(item.filename)}</span>
+          <span class="shelf-item-status">Completed • ${item.size} bytes</span>
+        </div>
+        <button class="shelf-item-action btn-open-download" data-path="${escapeHtml(item.path)}" title="Show in folder">📂</button>
+      `;
+      itemsContainer.prepend(div);
+    }
   }
 
   showError(msg) {

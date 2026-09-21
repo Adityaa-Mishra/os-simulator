@@ -111,6 +111,11 @@ export class NotesApp {
 
   loadNotesList() {
     try {
+      if (!this.api?.fs || !this.api.fs.exists(this.notesDir)) {
+        this.notes = [];
+        this.renderNotesList();
+        return;
+      }
       const entries = this.api.fs.listDirectory(this.notesDir);
       this.notes = entries.filter(e => e.type === 'file' && (e.name.endsWith('.txt') || e.name.endsWith('.md')));
       this.renderNotesList();

@@ -47,9 +47,9 @@ export const DEFAULT_HARDWARE_PROFILE = Object.freeze({
     name: 'Virtual Primary Drive',
     vendor: 'AdityyaOS Storage Systems',
     model: 'NVMe-VDisk',
-    capacityBytes: 102400, // 100 KB simulated capacity
+    capacityBytes: 524288, // 512 KB simulated capacity
     sectorSize: 512,
-    totalCylinders: 200
+    totalCylinders: 1024
   },
   display: {
     id: 'display0',

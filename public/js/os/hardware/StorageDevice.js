@@ -28,13 +28,13 @@ export class StorageDevice extends HardwareDevice {
 
     this.capacityBytes = typeof config.capacityBytes === 'number' && config.capacityBytes > 0
       ? Math.floor(config.capacityBytes)
-      : 102400; // 100 KB
+      : 524288; // 512 KB
     this.sectorSize = typeof config.sectorSize === 'number' && config.sectorSize > 0
       ? Math.floor(config.sectorSize)
       : 512;
     this.totalCylinders = typeof config.totalCylinders === 'number' && config.totalCylinders > 0
       ? Math.floor(config.totalCylinders)
-      : 200;
+      : 1024;
 
     this.totalSectors = Math.floor(this.capacityBytes / this.sectorSize);
     this.headPosition = 0;

@@ -92,7 +92,7 @@ describe('Phase 24: Web Browser Native Application', () => {
 
   it('conforms to standard Application Definition schema', () => {
     expect(browserApp.id).toBe('browser');
-    expect(browserApp.name).toBe('Web Browser');
+    expect(browserApp.name).toBe('Additya Browser');
     expect(browserApp.category).toBe('Internet');
     expect(typeof browserApp.entry).toBe('function');
     expect(browserApp.permissions).toContain('filesystem.read');

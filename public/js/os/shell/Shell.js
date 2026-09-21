@@ -30,6 +30,10 @@ export class Shell {
       if (!this.registry.windowManager) this.registry.windowManager = this.windowManager;
       if (!this.registry.kernel && this.windowManager?.kernel) this.registry.kernel = this.windowManager.kernel;
     }
+    this.windowManager.applicationRegistry = this.registry;
+    if (typeof window !== 'undefined') {
+      window.adityyaShell = this;
+    }
     this.runtime = runtime || null;
 
     this.eventCleanups = [];

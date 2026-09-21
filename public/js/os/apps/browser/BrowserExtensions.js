@@ -86,7 +86,6 @@ export class BrowserExtensions {
     }
 
     this.extensions = DEFAULT_EXTENSIONS.map(ext => ({ ...ext }));
-    this.save();
   }
 
   save() {

@@ -32,7 +32,7 @@ describe('Phase 24: Browser Navigation & URL Handling', () => {
 
     it('treats space-separated or non-domain inputs as search queries', () => {
       const normalized = BrowserNavigation.normalizeUrl('adityya os simulator');
-      expect(normalized).toContain('google.com/search?q=adityya');
+      expect(normalized).toContain('adityya://search?q=adityya');
     });
   });
 

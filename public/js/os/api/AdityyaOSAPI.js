@@ -47,8 +47,9 @@ export class AdityyaOSAPI {
     this.fs = new FileSystemAPI({ kernel, context });
     this.memory = new MemoryAPI({ kernel, context });
     this.events = new EventAPI({ events: kernel.events, context });
-    this.window = windowModel ? new WindowAPI({ windowManager, windowModel, context }) : null;
-    this.app = new ApplicationAPI({ runtime, context });
+    this.windowManager = windowManager;
+    this.window = (windowManager || windowModel) ? new WindowAPI({ windowManager, windowModel, context }) : null;
+    this.app = new ApplicationAPI({ runtime, windowManager, context });
     this.network = new NetworkAPI({ kernel, context });
     this.ai = new AIAPI({ kernel, context });
     const aiControlPort = kernel.aiControlService ? kernel.aiControlService.getPort() : null;
